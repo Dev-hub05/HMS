@@ -1,0 +1,99 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Queries — HMS Admin{% endblock %}
+{% block page_title %}Contact Queries{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Contact Queries</h2>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs">
+    <a href="{% url 'query_list' %}" class="filter-tab {% if filter_type == 'all' %}active{% endif %}">All</a>
+    <a href="{% url 'query_list' %}?filter=unread" class="filter-tab {% if filter_type == 'unread' %}active{% endif %}">
+        Unread {% if unread_query_count %}<span class="badge badge-count" style="margin-left:4px;">{{ unread_query_count }}</span>{% endif %}
+    </a>
+    <a href="{% url 'query_list' %}?filter=read" class="filter-tab {% if filter_type == 'read' %}active{% endif %}">Read</a>
+</div>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if contacts %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in contacts %}
+                    <tr style="{% if not c.is_read %}font-weight:600;{% endif %}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.email }}</td>
+                        <td>{{ c.subject|truncatechars:30 }}</td>
+                        <td>{{ c.created_at|date:"d M Y" }}</td>
+                        <td>
+                            {% if c.is_read %}
+                            <span class="badge badge-success">Read</span>
+                            {% else %}
+                            <span class="badge badge-warning">Unread</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'query_detail' c.id %}" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i> View</a>
+                                <form method="POST" action="{% url 'query_delete' c.id %}" class="delete-form" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="table-empty">
+            <i class="fas fa-envelope-open"></i>
+            <p>No queries found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if contacts.has_other_pages %}
+<div class="pagination">
+    {% if contacts.has_previous %}
+    <a href="?page={{ contacts.previous_page_number }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}">&laquo;</a>
+    {% else %}
+    <span class="disabled">&laquo;</span>
+    {% endif %}
+
+    {% for num in contacts.paginator.page_range %}
+        {% if contacts.number == num %}
+        <span class="current">{{ num }}</span>
+        {% elif num > contacts.number|add:'-3' and num < contacts.number|add:'3' %}
+        <a href="?page={{ num }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if contacts.has_next %}
+    <a href="?page={{ contacts.next_page_number }}{% if filter_type != 'all' %}&filter={{ filter_type }}{% endif %}">&raquo;</a>
+    {% else %}
+    <span class="disabled">&raquo;</span>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

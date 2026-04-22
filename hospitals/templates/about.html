@@ -1,0 +1,53 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}About Us — Hospital Management System{% endblock %}
+
+{% block content %}
+<div style="padding-top: 72px;">
+    <section class="section">
+        <div class="section-container">
+            <div class="text-center mb-3">
+                <h2 class="section-title">About Our Hospital</h2>
+                <p class="section-subtitle">Committed to excellence in patient care and medical innovation.</p>
+            </div>
+
+            <!-- Row 1 -->
+            <div class="about-row animate-on-scroll">
+                <div class="about-text">
+                    <h3><i class="fas fa-hospital-alt"></i> Our Hospital</h3>
+                    <p>A hospital is where people go to be healed when they are sick or injured. Our facility offers both inpatient and outpatient services, staffed by highly qualified doctors and nurses who leverage advanced medical technology to deliver the best possible care.</p>
+                    <p style="margin-top:12px;">We are dedicated to providing comprehensive healthcare services with compassion, integrity, and respect for every patient who walks through our doors.</p>
+                </div>
+                <div class="about-img">
+                    <img src="{% static 'images/about-1.jpg' %}" alt="Hospital exterior">
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="about-row reverse animate-on-scroll">
+                <div class="about-text">
+                    <h3><i class="fas fa-stethoscope"></i> Doctors &amp; Nurses</h3>
+                    <p>Our team of expert doctors and dedicated nurses work tirelessly to ensure the highest standards of medical care. From diagnosis to treatment and recovery, our medical professionals are with you every step of the way.</p>
+                    <p style="margin-top:12px;">Each member of our staff is trained in the latest medical techniques and committed to continuous learning to provide cutting-edge healthcare solutions.</p>
+                </div>
+                <div class="about-img">
+                    <img src="{% static 'images/about1.jpg' %}" alt="Medical team">
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="about-row animate-on-scroll">
+                <div class="about-text">
+                    <h3><i class="fas fa-hand-holding-medical"></i> Support Staff</h3>
+                    <p>Behind every great hospital is a team of dedicated support staff. Our cleaning operatives, maintenance crews, and administrative personnel ensure that the hospital environment remains safe, hygienic, and welcoming for all patients and visitors.</p>
+                    <p style="margin-top:12px;">They are the backbone of our operations, maintaining the highest standards of cleanliness and organization throughout the facility.</p>
+                </div>
+                <div class="about-img">
+                    <img src="{% static 'images/about2.jpg' %}" alt="Support staff">
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

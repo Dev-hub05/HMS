@@ -1,0 +1,92 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Doctors — HMS Admin{% endblock %}
+{% block page_title %}Doctors{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>All Doctors</h2>
+    <a href="{% url 'doctor_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Doctor
+    </a>
+</div>
+
+<!-- Search -->
+<form method="GET" class="search-bar">
+    <input type="text" name="q" class="form-input" placeholder="Search by name or specialization..." value="{{ query }}">
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+    {% if query %}<a href="{% url 'doctor_list' %}" class="btn btn-outline btn-sm">Clear</a>{% endif %}
+</form>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if doctors %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Specialization</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in doctors %}
+                    <tr>
+                        <td>{{ doc.id }}</td>
+                        <td class="fw-600">Dr. {{ doc.name }}</td>
+                        <td>{{ doc.phone }}</td>
+                        <td><span class="badge badge-primary">{{ doc.specialization }}</span></td>
+                        <td>{{ doc.email|default:"—" }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'doctor_edit' doc.id %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Edit</a>
+                                <form method="POST" action="{% url 'doctor_delete' doc.id %}" class="delete-form" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="table-empty">
+            <i class="fas fa-user-md"></i>
+            <p>No doctors found. <a href="{% url 'doctor_add' %}" style="color:var(--color-primary)">Add one now</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if doctors.has_other_pages %}
+<div class="pagination">
+    {% if doctors.has_previous %}
+    <a href="?page={{ doctors.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo;</a>
+    {% else %}
+    <span class="disabled">&laquo;</span>
+    {% endif %}
+
+    {% for num in doctors.paginator.page_range %}
+        {% if doctors.number == num %}
+        <span class="current">{{ num }}</span>
+        {% elif num > doctors.number|add:'-3' and num < doctors.number|add:'3' %}
+        <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if doctors.has_next %}
+    <a href="?page={{ doctors.next_page_number }}{% if query %}&q={{ query }}{% endif %}">&raquo;</a>
+    {% else %}
+    <span class="disabled">&raquo;</span>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

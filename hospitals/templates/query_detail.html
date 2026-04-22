@@ -1,0 +1,65 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Query #{{ query.id }} — HMS Admin{% endblock %}
+{% block page_title %}Query Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Query from {{ query.name }}</h2>
+    <div style="display: flex; gap: 8px;">
+        <a href="{% url 'query_list' %}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i> Back to Queries
+        </a>
+        <form method="POST" action="{% url 'query_delete' query.id %}" class="delete-form" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash"></i> Delete
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card" style="max-width: 800px;">
+    <div class="card-header">
+        <div>
+            <h4 style="margin-bottom: 4px;">{{ query.subject }}</h4>
+            <span class="text-muted" style="font-size: 13px;">
+                Received on {{ query.created_at|date:"d M Y, h:i A" }}
+                &nbsp;·&nbsp;
+                {% if query.is_read %}
+                <span class="badge badge-success">Read</span>
+                {% else %}
+                <span class="badge badge-warning">Unread</span>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Meta Info -->
+        <div class="query-meta">
+            <div class="query-meta-item">
+                <label><i class="fas fa-user"></i> Name</label>
+                <span>{{ query.name }}</span>
+            </div>
+            <div class="query-meta-item">
+                <label><i class="fas fa-phone"></i> Phone</label>
+                <span>{{ query.phone }}</span>
+            </div>
+            <div class="query-meta-item">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <span>{{ query.email }}</span>
+            </div>
+            <div class="query-meta-item">
+                <label><i class="fas fa-calendar"></i> Date</label>
+                <span>{{ query.created_at|date:"d M Y, h:i A" }}</span>
+            </div>
+        </div>
+
+        <!-- Message -->
+        <h5 style="margin-bottom: 12px;"><i class="fas fa-comment-alt" style="color:var(--color-primary);"></i> Message</h5>
+        <div class="query-message">
+            {{ query.message|linebreaksbr }}
+        </div>
+    </div>
+</div>
+{% endblock %}

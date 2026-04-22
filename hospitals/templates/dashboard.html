@@ -1,0 +1,164 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Dashboard — HMS Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- ── Stat Cards ── -->
+<div class="stats-grid">
+    <div class="stat-card stat-card-purple animate-in">
+        <div class="stat-card-icon"><i class="fas fa-user-md"></i></div>
+        <div class="stat-card-value">{{ doctor_count }}</div>
+        <div class="stat-card-label">Total Doctors</div>
+    </div>
+    <div class="stat-card stat-card-green animate-in">
+        <div class="stat-card-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-card-value">{{ patient_count }}</div>
+        <div class="stat-card-label">Total Patients</div>
+    </div>
+    <div class="stat-card stat-card-blue animate-in">
+        <div class="stat-card-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-card-value">{{ appointment_count }}</div>
+        <div class="stat-card-label">Total Appointments</div>
+    </div>
+    <div class="stat-card stat-card-pink animate-in">
+        <div class="stat-card-icon"><i class="fas fa-envelope-open-text"></i></div>
+        <div class="stat-card-value">{{ query_count }}</div>
+        <div class="stat-card-label">Unread Queries</div>
+    </div>
+</div>
+
+<!-- ── Main Content Grid ── -->
+<div class="dashboard-grid">
+
+    <!-- Today's Appointments -->
+    <div class="card animate-in">
+        <div class="card-header">
+            <h4><i class="fas fa-calendar-day" style="color:var(--color-primary); margin-right:8px;"></i> Today's Appointments</h4>
+            <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            {% if today_appointments %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Doctor</th>
+                            <th>Patient</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for apt in today_appointments %}
+                        <tr>
+                            <td class="fw-600">Dr. {{ apt.doctor.name }}</td>
+                            <td>{{ apt.patient.name }}</td>
+                            <td>{{ apt.time|time:"h:i A" }}</td>
+                            <td>
+                                <span class="badge {% if apt.status == 'Pending' %}badge-warning{% elif apt.status == 'Confirmed' %}badge-primary{% elif apt.status == 'Completed' %}badge-success{% else %}badge-danger{% endif %}">
+                                    {{ apt.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="table-empty">
+                <i class="fas fa-calendar-times"></i>
+                <p>No appointments scheduled for today.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Chart + Recent Queries -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Appointment Status Chart -->
+        <div class="card animate-in">
+            <div class="card-header">
+                <h4><i class="fas fa-chart-pie" style="color:var(--color-info); margin-right:8px;"></i> Appointment Status</h4>
+            </div>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Unread Queries -->
+        <div class="card animate-in">
+            <div class="card-header">
+                <h4><i class="fas fa-envelope" style="color:var(--color-danger); margin-right:8px;"></i> Unread Queries</h4>
+                <a href="{% url 'query_list' %}?filter=unread" class="btn btn-sm btn-outline">View All</a>
+            </div>
+            <div class="card-body" style="padding: 0;">
+                {% if recent_queries %}
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Subject</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for q in recent_queries %}
+                            <tr>
+                                <td class="fw-600">{{ q.name }}</td>
+                                <td><a href="{% url 'query_detail' q.id %}" style="color: var(--color-primary);">{{ q.subject|truncatechars:30 }}</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="table-empty">
+                    <i class="fas fa-check-circle"></i>
+                    <p>All queries have been read!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const ctx = document.getElementById('statusChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Confirmed', 'Completed', 'Cancelled'],
+                datasets: [{
+                    data: [{{ pending_count }}, {{ confirmed_count }}, {{ completed_count }}, {{ cancelled_count }}],
+                    backgroundColor: ['#f59e0b', '#2563eb', '#10b981', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 16,
+                            usePointStyle: true,
+                            pointStyleWidth: 10,
+                            font: { family: 'Inter', size: 13 }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

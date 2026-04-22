@@ -1,0 +1,63 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}{% if is_edit %}Edit Appointment{% else %}New Appointment{% endif %} — HMS Admin{% endblock %}
+{% block page_title %}{% if is_edit %}Edit Appointment{% else %}New Appointment{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>{% if is_edit %}Edit Appointment #{{ appointment.id }}{% else %}Schedule New Appointment{% endif %}</h2>
+    <a href="{% url 'appointment_list' %}" class="btn btn-outline">
+        <i class="fas fa-arrow-left"></i> Back to List
+    </a>
+</div>
+
+<div class="card" style="max-width: 700px;">
+    <div class="card-body">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_doctor">Doctor</label>
+                    {{ form.doctor }}
+                    {{ form.doctor.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="id_patient">Patient</label>
+                    {{ form.patient }}
+                    {{ form.patient.errors }}
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_date">Date</label>
+                    {{ form.date }}
+                    {{ form.date.errors }}
+                </div>
+                <div class="form-group">
+                    <label for="id_time">Time</label>
+                    {{ form.time }}
+                    {{ form.time.errors }}
+                </div>
+            </div>
+            {% if is_edit %}
+            <div class="form-group">
+                <label for="id_status">Status</label>
+                {{ form.status }}
+                {{ form.status.errors }}
+            </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="id_notes">Notes</label>
+                {{ form.notes }}
+                {{ form.notes.errors }}
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 8px;">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> {% if is_edit %}Update Appointment{% else %}Schedule Appointment{% endif %}
+                </button>
+                <a href="{% url 'appointment_list' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

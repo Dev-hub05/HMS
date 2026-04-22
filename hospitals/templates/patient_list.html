@@ -1,0 +1,96 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Patients — HMS Admin{% endblock %}
+{% block page_title %}Patients{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>All Patients</h2>
+    <a href="{% url 'patient_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add Patient
+    </a>
+</div>
+
+<!-- Search -->
+<form method="GET" class="search-bar">
+    <input type="text" name="q" class="form-input" placeholder="Search by name, phone or address..." value="{{ query }}">
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+    {% if query %}<a href="{% url 'patient_list' %}" class="btn btn-outline btn-sm">Clear</a>{% endif %}
+</form>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if patients %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pat in patients %}
+                    <tr>
+                        <td>{{ pat.id }}</td>
+                        <td class="fw-600">{{ pat.name }}</td>
+                        <td>
+                            <span class="badge {% if pat.gender == 'Male' %}badge-primary{% elif pat.gender == 'Female' %}badge-danger{% else %}badge-info{% endif %}">
+                                {{ pat.gender }}
+                            </span>
+                        </td>
+                        <td>{{ pat.phone }}</td>
+                        <td>{{ pat.address|truncatechars:35 }}</td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'patient_edit' pat.id %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Edit</a>
+                                <form method="POST" action="{% url 'patient_delete' pat.id %}" class="delete-form" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="table-empty">
+            <i class="fas fa-users"></i>
+            <p>No patients found. <a href="{% url 'patient_add' %}" style="color:var(--color-primary)">Add one now</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if patients.has_other_pages %}
+<div class="pagination">
+    {% if patients.has_previous %}
+    <a href="?page={{ patients.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo;</a>
+    {% else %}
+    <span class="disabled">&laquo;</span>
+    {% endif %}
+
+    {% for num in patients.paginator.page_range %}
+        {% if patients.number == num %}
+        <span class="current">{{ num }}</span>
+        {% elif num > patients.number|add:'-3' and num < patients.number|add:'3' %}
+        <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if patients.has_next %}
+    <a href="?page={{ patients.next_page_number }}{% if query %}&q={{ query }}{% endif %}">&raquo;</a>
+    {% else %}
+    <span class="disabled">&raquo;</span>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

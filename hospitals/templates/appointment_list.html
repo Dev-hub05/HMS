@@ -1,0 +1,104 @@
+{% extends 'base_admin.html' %}
+
+{% block title %}Appointments — HMS Admin{% endblock %}
+{% block page_title %}Appointments{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>All Appointments</h2>
+    <a href="{% url 'appointment_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> New Appointment
+    </a>
+</div>
+
+<!-- Search & Filters -->
+<form method="GET" class="search-bar">
+    <input type="text" name="q" class="form-input" placeholder="Search by doctor or patient name..." value="{{ query }}">
+    <select name="status" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+        <option value="">All Status</option>
+        {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Search</button>
+    {% if query or status_filter %}<a href="{% url 'appointment_list' %}" class="btn btn-outline btn-sm">Clear</a>{% endif %}
+</form>
+
+<!-- Table -->
+<div class="card">
+    <div class="card-body" style="padding: 0;">
+        {% if appointments %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Doctor</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for apt in appointments %}
+                    <tr>
+                        <td>{{ apt.id }}</td>
+                        <td class="fw-600">Dr. {{ apt.doctor.name }}</td>
+                        <td>{{ apt.patient.name }}</td>
+                        <td>{{ apt.date|date:"d M Y" }}</td>
+                        <td>{{ apt.time|time:"h:i A" }}</td>
+                        <td>
+                            <span class="badge {% if apt.status == 'Pending' %}badge-warning{% elif apt.status == 'Confirmed' %}badge-primary{% elif apt.status == 'Completed' %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ apt.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="{% url 'appointment_edit' apt.id %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                <form method="POST" action="{% url 'appointment_delete' apt.id %}" class="delete-form" style="margin:0;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="table-empty">
+            <i class="fas fa-calendar-times"></i>
+            <p>No appointments found. <a href="{% url 'appointment_add' %}" style="color:var(--color-primary)">Schedule one now</a>.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if appointments.has_other_pages %}
+<div class="pagination">
+    {% if appointments.has_previous %}
+    <a href="?page={{ appointments.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">&laquo;</a>
+    {% else %}
+    <span class="disabled">&laquo;</span>
+    {% endif %}
+
+    {% for num in appointments.paginator.page_range %}
+        {% if appointments.number == num %}
+        <span class="current">{{ num }}</span>
+        {% elif num > appointments.number|add:'-3' and num < appointments.number|add:'3' %}
+        <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+
+    {% if appointments.has_next %}
+    <a href="?page={{ appointments.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">&raquo;</a>
+    {% else %}
+    <span class="disabled">&raquo;</span>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

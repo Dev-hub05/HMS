@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="admin-wrapper">
+
+    <!-- ── Sidebar Overlay (mobile) ── -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'dashboard' %}" class="sidebar-logo">
+                <i class="fas fa-hospital"></i>
+                <span>HMS Admin</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="sidebar-section">Management</div>
+
+            <a href="{% url 'doctor_list' %}" class="sidebar-link {% if 'doctor' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-user-md"></i>
+                <span>Doctors</span>
+            </a>
+            <a href="{% url 'patient_list' %}" class="sidebar-link {% if 'patient' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Patients</span>
+            </a>
+            <a href="{% url 'appointment_list' %}" class="sidebar-link {% if 'appointment' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-calendar-check"></i>
+                <span>Appointments</span>
+            </a>
+
+            <div class="sidebar-section">Communication</div>
+
+            <a href="{% url 'query_list' %}" class="sidebar-link {% if 'query' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-envelope"></i>
+                <span>Queries</span>
+                {% if unread_query_count %}
+                <span class="badge badge-count">{{ unread_query_count }}</span>
+                {% endif %}
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'index' %}" class="sidebar-link">
+                <i class="fas fa-globe"></i>
+                <span>View Website</span>
+            </a>
+            <a href="{% url 'logout' %}" class="sidebar-link">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <div class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <span class="topbar-title">{% block page_title %}Dashboard{% endblock %}</span>
+            </div>
+            <div class="topbar-right">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ request.user.username|first|upper }}
+                    </div>
+                    <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+            <div class="message message-{{ message.tags }}" data-auto-dismiss>
+                <span>{{ message }}</span>
+                <button class="message-close" aria-label="Close">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Content -->
+        <div class="content-area">
+            {% block content %}{% endblock %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

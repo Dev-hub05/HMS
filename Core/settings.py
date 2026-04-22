@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'hospitals',
+    'hms_logic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'HospitalManagementSystem.urls'
+ROOT_URLCONF = 'Core.urls'
 
 TEMPLATES = [
     {
@@ -69,13 +69,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'hospitals.context_processors.unread_queries',
+                'hms_logic.context_processors.unread_queries',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'HospitalManagementSystem.wsgi.application'
+WSGI_APPLICATION = 'Core.wsgi.application'
 
 
 # Database

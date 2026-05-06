@@ -18,55 +18,72 @@
     {% if query %}<a href="{% url 'patient_list' %}" class="btn btn-outline btn-sm">Clear</a>{% endif %}
 </form>
 
-<!-- Table -->
-<div class="card">
-    <div class="card-body" style="padding: 0;">
-        {% if patients %}
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Gender</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for pat in patients %}
-                    <tr>
-                        <td>{{ pat.id }}</td>
-                        <td class="fw-600">{{ pat.name }}</td>
-                        <td>
-                            <span class="badge {% if pat.gender == 'Male' %}badge-primary{% elif pat.gender == 'Female' %}badge-danger{% else %}badge-info{% endif %}">
-                                {{ pat.gender }}
-                            </span>
-                        </td>
-                        <td>{{ pat.phone }}</td>
-                        <td>{{ pat.address|truncatechars:35 }}</td>
-                        <td>
-                            <div class="table-actions">
-                                <a href="{% url 'patient_edit' pat.id %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Edit</a>
-                                <form method="POST" action="{% url 'patient_delete' pat.id %}" class="delete-form" style="margin:0;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="table-empty">
-            <i class="fas fa-users"></i>
-            <p>No patients found. <a href="{% url 'patient_add' %}" style="color:var(--color-primary)">Add one now</a>.</p>
-        </div>
-        {% endif %}
+<!-- Advanced Search & Filter -->
+<div class="card mb-3 animate-in">
+    <div class="card-body">
+        <form method="GET" class="search-bar" style="margin-bottom: 0;">
+            <div style="flex: 1; position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                <input type="text" name="q" class="form-input" style="padding-left: 35px;" placeholder="Search by name, phone, or address..." value="{{ query }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Search Records</button>
+            {% if query %}<a href="{% url 'patient_list' %}" class="btn btn-outline">Clear</a>{% endif %}
+        </form>
     </div>
+</div>
+
+<!-- Patient Grid -->
+<div class="features-grid">
+    {% if patients %}
+        {% for pat in patients %}
+        <div class="card animate-in" style="overflow: visible;">
+            <div class="card-body">
+                <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                    <div class="user-avatar" style="width: 54px; height: 54px; font-size: 1.2rem; flex-shrink: 0; background: var(--gradient-success);">
+                        {{ pat.name|first|upper }}
+                    </div>
+                    <div>
+                        <h4 class="mb-0">{{ pat.name }}</h4>
+                        <span class="badge {% if pat.gender == 'Male' %}badge-primary{% elif pat.gender == 'Female' %}badge-danger{% else %}badge-info{% endif %}" style="margin-top: 4px;">
+                            {{ pat.gender }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div style="margin: 15px 0; padding: 15px; background: var(--color-bg); border-radius: var(--radius-md);">
+                    <div style="font-size: 13px; margin-bottom: 10px;">
+                        <i class="fas fa-phone-alt" style="color: var(--color-success); width: 20px;"></i> {{ pat.phone }}
+                    </div>
+                    <div style="font-size: 13px; margin-bottom: 10px;">
+                        <i class="fas fa-calendar-alt" style="color: var(--color-success); width: 20px;"></i> DOB: {{ pat.date_of_birth|date:"d M Y"|default:"Not set" }}
+                    </div>
+                    <div style="font-size: 13px;">
+                        <i class="fas fa-map-marker-alt" style="color: var(--color-success); width: 20px;"></i> {{ pat.address|truncatechars:40 }}
+                    </div>
+                </div>
+
+                <div class="table-actions" style="margin-top: 20px;">
+                    <a href="{% url 'patient_edit' pat.id %}" class="btn btn-sm btn-outline" style="flex: 1;">
+                        <i class="fas fa-file-medical"></i> View Profile
+                    </a>
+                    <form method="POST" action="{% url 'patient_delete' pat.id %}" style="margin: 0; flex: 0 0 auto;" onsubmit="return confirm('Are you sure you want to delete this patient record?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="table-empty">
+                <i class="fas fa-users"></i>
+                <p>No patients match your search. <a href="{% url 'patient_add' %}" style="color:var(--color-primary)">Add new record</a>.</p>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Pagination -->

@@ -1,5 +1,11 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from . import views, api_views
+
+router = DefaultRouter()
+router.register(r'doctors', api_views.DoctorViewSet)
+router.register(r'patients', api_views.PatientViewSet)
+router.register(r'appointments', api_views.AppointmentViewSet)
 
 urlpatterns = [
     # ── Public Pages ──
@@ -36,4 +42,7 @@ urlpatterns = [
     path('queries/', views.query_list, name='query_list'),
     path('queries/<int:pk>/', views.query_detail, name='query_detail'),
     path('queries/<int:pk>/delete/', views.query_delete, name='query_delete'),
+
+    # ── API Endpoints ──
+    path('api/', include(router.urls)),
 ]

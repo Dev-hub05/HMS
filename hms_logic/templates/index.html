@@ -11,8 +11,8 @@
         <h1>Modern <span>Hospital</span><br>Management System</h1>
         <p>Streamline your healthcare operations with our comprehensive management platform. Manage doctors, patients, and appointments — all in one place.</p>
         <div class="hero-buttons">
-            <a href="{% url 'contact' %}" class="hero-btn hero-btn-primary">
-                <i class="fas fa-paper-plane"></i>&nbsp; Get in Touch
+            <a href="{% url 'dashboard' %}" class="hero-btn hero-btn-primary">
+                <i class="fas fa-tachometer-alt"></i>&nbsp; Go to Dashboard
             </a>
             <a href="{% url 'about' %}" class="hero-btn hero-btn-outline">
                 Learn More &nbsp;<i class="fas fa-arrow-right"></i>
@@ -39,35 +39,4 @@
     </div>
 </section>
 
-<!-- ── Features Section ── -->
-<section class="section" style="background: var(--color-bg);">
-    <div class="section-container text-center">
-        <h2 class="section-title">Why Choose Our System?</h2>
-        <p class="section-subtitle">Everything you need to run a modern healthcare facility.</p>
-
-        <div class="features-grid">
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon" style="background: var(--gradient-primary);">
-                    <i class="fas fa-user-md"></i>
-                </div>
-                <h4>Doctor Management</h4>
-                <p>Maintain a comprehensive database of doctors with their specializations, contact information, and schedules — all easily searchable.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon" style="background: var(--gradient-success);">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h4>Patient Records</h4>
-                <p>Securely store and manage patient information including personal details, medical history, and contact information.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon" style="background: var(--gradient-info);">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <h4>Appointment Scheduling</h4>
-                <p>Efficiently schedule and track appointments between doctors and patients with real-time status updates.</p>
-            </div>
-        </div>
-    </div>
-</section>
 {% endblock %}

@@ -24,57 +24,79 @@
     {% if query or status_filter %}<a href="{% url 'appointment_list' %}" class="btn btn-outline btn-sm">Clear</a>{% endif %}
 </form>
 
-<!-- Table -->
-<div class="card">
-    <div class="card-body" style="padding: 0;">
-        {% if appointments %}
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Doctor</th>
-                        <th>Patient</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for apt in appointments %}
-                    <tr>
-                        <td>{{ apt.id }}</td>
-                        <td class="fw-600">Dr. {{ apt.doctor.name }}</td>
-                        <td>{{ apt.patient.name }}</td>
-                        <td>{{ apt.date|date:"d M Y" }}</td>
-                        <td>{{ apt.time|time:"h:i A" }}</td>
-                        <td>
-                            <span class="badge {% if apt.status == 'Pending' %}badge-warning{% elif apt.status == 'Confirmed' %}badge-primary{% elif apt.status == 'Completed' %}badge-success{% else %}badge-danger{% endif %}">
-                                {{ apt.status }}
-                            </span>
-                        </td>
-                        <td>
-                            <div class="table-actions">
-                                <a href="{% url 'appointment_edit' apt.id %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i></a>
-                                <form method="POST" action="{% url 'appointment_delete' apt.id %}" class="delete-form" style="margin:0;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="table-empty">
-            <i class="fas fa-calendar-times"></i>
-            <p>No appointments found. <a href="{% url 'appointment_add' %}" style="color:var(--color-primary)">Schedule one now</a>.</p>
-        </div>
-        {% endif %}
+<!-- Advanced Search & Filter -->
+<div class="card mb-3 animate-in">
+    <div class="card-body">
+        <form method="GET" class="search-bar" style="margin-bottom: 0;">
+            <div style="flex: 1; position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                <input type="text" name="q" class="form-input" style="padding-left: 35px;" placeholder="Search by doctor or patient name..." value="{{ query }}">
+            </div>
+            <select name="status" class="form-select" style="max-width: 180px;" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            {% if query or status_filter %}<a href="{% url 'appointment_list' %}" class="btn btn-outline">Reset</a>{% endif %}
+        </form>
     </div>
+</div>
+
+<!-- Appointment Grid -->
+<div class="features-grid">
+    {% if appointments %}
+        {% for apt in appointments %}
+        <div class="card animate-in" style="border-top: 4px solid {% if apt.status == 'Pending' %}#f59e0b{% elif apt.status == 'Confirmed' %}#2563eb{% elif apt.status == 'Completed' %}#10b981{% else %}#ef4444{% endif %};">
+            <div class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                    <div>
+                        <div style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Appointment ID: #{{ apt.id }}</div>
+                        <h4 class="mt-1" style="color: var(--color-primary);">{{ apt.date|date:"l, d M Y" }}</h4>
+                    </div>
+                    <span class="badge {% if apt.status == 'Pending' %}badge-warning{% elif apt.status == 'Confirmed' %}badge-primary{% elif apt.status == 'Completed' %}badge-success{% else %}badge-danger{% endif %}">
+                        {{ apt.status }}
+                    </span>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin: 15px 0;">
+                    <div style="flex: 1; padding: 12px; background: var(--color-bg); border-radius: var(--radius-md);">
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Doctor</label>
+                        <div style="font-weight: 600;">Dr. {{ apt.doctor.name }}</div>
+                    </div>
+                    <div style="flex: 1; padding: 12px; background: var(--color-bg); border-radius: var(--radius-md);">
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Patient</label>
+                        <div style="font-weight: 600;">{{ apt.patient.name }}</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 14px; margin-bottom: 20px;">
+                    <i class="fas fa-clock" style="color: var(--color-info); margin-right: 8px;"></i> Scheduled at: <strong>{{ apt.time|time:"h:i A" }}</strong>
+                </div>
+
+                <div class="table-actions">
+                    <a href="{% url 'appointment_edit' apt.id %}" class="btn btn-sm btn-primary" style="flex: 1;">
+                        <i class="fas fa-edit"></i> Manage
+                    </a>
+                    <form method="POST" action="{% url 'appointment_delete' apt.id %}" style="margin: 0; flex: 0 0 auto;" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card" style="grid-column: 1 / -1;">
+            <div class="table-empty">
+                <i class="fas fa-calendar-times"></i>
+                <p>No appointments found. <a href="{% url 'appointment_add' %}" style="color:var(--color-primary)">Schedule one now</a>.</p>
+            </div>
+        </div>
+    {% endif %}
 </div>
 
 <!-- Pagination -->
